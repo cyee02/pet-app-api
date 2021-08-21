@@ -1,0 +1,36 @@
+{
+  "name": "pet-app-api",
+  "version": "1.0.0",
+  "description": "graphql API for pet-app",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node ./src/index.js",
+    "dev": "nodemon ./src/dev.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "./bin/deploy.sh"
+  },
+  "author": "chongyeechia",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.18.0",
+    "@aws-sdk/client-s3": "^3.22.0",
+    "apollo-server": "^3.0.2",
+    "apollo-server-express": "^2.25.2",
+    "apollo-server-koa": "^3.1.1",
+    "apollo-server-lambda": "^2.25.2",
+    "aws-sdk": "^2.950.0",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^10.0.0",
+    "dynamodb-data-types": "^3.0.1",
+    "express": "^4.17.1",
+    "express-graphql": "^0.12.0",
+    "graphql": "^15.5.0",
+    "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.21",
+    "uuid": "^8.3.2",
+    "yup": "^0.32.9"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  }
+}

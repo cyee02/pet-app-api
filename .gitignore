@@ -1,0 +1,5 @@
+node_modules
+src/.env
+scratch.js
+sdkTest.js
+dist
