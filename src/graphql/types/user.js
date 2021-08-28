@@ -11,13 +11,14 @@ const typeDefs = gql`
       phoneNumber: String
       description: String
       email: String
+      profilePicture: [String]
+      images: [String]
     }
     `
 // birthday: String
-// profilePicture: String
 // followers: [String]
 // following: [String]
 // groups: [String]
-// images: [String]
+
 
 module.exports = { typeDefs }

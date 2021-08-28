@@ -8,7 +8,7 @@ const getUser = async (token) => {
   const params = {
     TableName: "pet-app-userInfo",
     Key: key,
-    ProjectionExpression: "username, address, description, email, firstName, lastName, gender, phoneNumber"
+    ProjectionExpression: "username, id, address, description, email, firstName, lastName, gender, phoneNumber, profilePicture, images"
   }
   try {
     const results = await dynamodb_client.getItem(params)

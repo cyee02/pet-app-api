@@ -1,5 +1,5 @@
 node_modules
 src/.env
-scratch.js
-sdkTest.js
 dist
+scratch_folder
+key.pem
