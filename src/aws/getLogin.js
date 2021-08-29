@@ -1,5 +1,5 @@
 const { DynamoDB } = require("@aws-sdk/client-dynamodb")
-const dynamodb_client = new DynamoDB()
+const dynamodb_client = new DynamoDB({region: "ap-southeast-1"})
 
 const attr = require('dynamodb-data-types').AttributeValue;
 
