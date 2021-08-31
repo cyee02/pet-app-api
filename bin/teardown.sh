@@ -1,4 +1,4 @@
-# chmod +x bin/deploy
+# chmod +x bin/teardown
 
 #!/bin/bash
 
@@ -10,12 +10,10 @@ STACK_NAME=pet-app-api
 
 cd $ROOT_DIR
 
-echo "deploying application.."
-aws cloudformation deploy \
-  --template-file $ROOT_DIR/template.yaml \
+echo "tearing down application.."
+aws cloudformation describe-stacks \
   --stack-name $STACK_NAME \
-  --capabilities CAPABILITY_NAMED_IAM
 
-echo "deployed"
+echo "teardown complete"
 
 cd $CURRENT_DIR
