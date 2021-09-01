@@ -110,6 +110,54 @@ Resources:
 
   Server:
     Type: AWS::EC2::Instance
+    # Metadata:
+    #     AWS::Cloudformation::Init:
+    #       configSets:
+    #         default:
+    #           - node
+    #           - git
+    #           - nginx
+
+    #       node:
+    #         commands: 
+    #           01-node-install:
+    #             command: 
+    #               Fn::Sub:
+    #                 - |+
+    #                     #!/bin/bash -x
+    #                     curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.32.1/install.sh | bash 
+    #                     source $HOME_DIR/.bashrc
+    #                     nvm install ${NodeVersion} -y
+    #                 - Param: "NA"
+    #       git:
+    #         commands: 
+    #           01-git-install-clone:
+    #             command: 
+    #               Fn::Sub:
+    #                 - |+
+    #                     #!/bin/bash -x
+    #                     sudo apt-get install git -y
+    #                     git clone ${GitUrl}
+    #                     cd pet-app-api
+    #                     npm install
+    #                 - Param: "NA"
+    #       nginx:
+    #         commands: 
+    #           01-nginx-install-start:
+    #             command: 
+    #                 - |+
+    #                     #!/bin/bash -x
+    #                     sudo apt-get install nginx -y
+    #                     sudo rm /etc/nginx/sites-enabled/default
+    #                     echo "listing current directory"
+    #                     ls
+    #                     sudo cp /pet-app-api/staging/nginx_config /etc/nginx/sites-available/pet-app-api
+    #                     sudo ln -s /etc/nginx/sites-available/pet-app-api /etc/nginx/sites-enabled/pet-app-api
+    #                     sudo /etc/init.d/nginx start
+    #                     cd pet-app-api
+    #                     npm start
+    #                 - Param: "NA"
+
     Properties:
       IamInstanceProfile: !Ref ServerInstanceProfile
       ImageId: !Ref AMI
@@ -119,36 +167,15 @@ Resources:
       SecurityGroupIds:
         - !Ref InstanceSecurityGroup
       UserData:
-        Fn::Base64:
-          Fn::Sub: |
-            Content-Type: text/x-shellscript
+        Fn::Base64: !Sub |
+          #!/bin/bash -xe
 
-            #!/bin/bash
-            set -ex
+          export HOME_DIR='/home/ubuntu/'
 
-            echo "=== Begin Userdata ==="
-            sudo apt-get update
+          echo "=== Begin Userdata ==="
+          sudo apt-get update
+          git clone ${GitUrl} $HOME_DIR/pet-app-api
 
-            # Install Node
-            curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.32.1/install.sh | bash
-            source ~/.bashrc
-            nvm install ${NodeVersion} -y
+          bash $HOME_DIR/pet-app-api/staging/setup.sh
 
-            # Clone repo
-            sudo apt-get install git -y
-            git clone ${GitUrl}
-            cd ~/pet-app-api
-            npm install
-
-            # Set up nginx
-            sudo apt-get install nginx -y
-            sudo rm /etc/nginx/sites-enabled/default
-            sudo cp ~/pet-app-api/staging/nginx_config /etc/nginx/sites-available/pet-app-api
-            sudo ln -s /etc/nginx/sites-available/pet-app-api /etc/nginx/sites-enabled/pet-app-api
-            sudo /etc/init.d/nginx start
-
-            # Start server
-            npm start
-
-            echo "=== End Userdata - SUCCESS ==="
-
+          echo "=== End Userdata - SUCCESS ==="

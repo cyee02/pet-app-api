@@ -11,8 +11,7 @@ STACK_NAME=pet-app-api
 cd $ROOT_DIR
 
 echo "tearing down application.."
-aws cloudformation describe-stacks \
-  --stack-name $STACK_NAME \
+aws cloudformation delete-stack --stack-name $STACK_NAME
 
 echo "teardown complete"
 
