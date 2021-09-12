@@ -61,49 +61,42 @@ const resolvers = {
 
       // Check if username exists
       const userExist = await getLogin(username)
-      if (userExist === undefined){
-        const userId = uuid()
-        const passwordHash = await createPasswordHash(password)
+      if (userExist !== undefined) throw UsernameTakenError.fromUsername(username)
 
-        // Create new user in pet-app-login table
-        var newUser = {
+      // Generate userId and passwordHash
+      const userId = uuid()
+      const passwordHash = await createPasswordHash(password)
+
+      // Create new user in pet-app-login table
+      const newUser = {
+        "username": username,
+        "id": userId,
+        "password": passwordHash
+      }
+      // Create new user in pet-app-userInfo table
+      const newUserInfo = {
           "username": username,
           "id": userId,
-          "password": passwordHash
-        }
-        // Create new user in pet-app-userInfo table
-        var newUserInfo = {
-            "username": username,
-            "id": userId,
-            "firstName": firstName,
-            "lastName": lastName,
-            "address": address,
-            "gender": gender,
-            "phoneNumber": phoneNumber,
-            "description": description,
-            "email": email,
-        }
-        
-        const updateUser = await putItem("pet-app-login", newUser)
-        const updateUserInfo = await putItem("pet-app-userInfo", newUserInfo)
-        if (updateUser.$metadata.httpStatusCode !== 200){
-          return updateUser
-        } else if (updateUserInfo.$metadata.httpStatusCode !==200){
-          return updateUserInfo
-        } else {
-          return {
-            username: username,
-            firstName: firstName,
-            lastName: lastName,
-            address: address,
-            gender: gender,
-            phoneNumber: phoneNumber,
-            description: description,
-            email: email
-          }
-        }
+          "firstName": firstName,
+          "lastName": lastName,
+          "address": address,
+          "gender": gender,
+          "phoneNumber": phoneNumber,
+          "description": description,
+          "email": email,
+      }
+      console.log(newUserInfo);
+      
+      const updateUser = await putItem("pet-app-login", newUser)
+      const updateUserInfo = await putItem("pet-app-userInfo", newUserInfo)
+      console.log(updateUserInfo);
+      if (updateUser.$metadata.httpStatusCode !== 200){
+        return updateUser
+      } else if (updateUserInfo.$metadata.httpStatusCode !== 200){
+        return updateUserInfo
       } else {
-        throw UsernameTakenError.fromUsername(username)
+        console.log(newUserInfo);
+        return newUserInfo
       }
     }
   }

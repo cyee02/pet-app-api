@@ -14,9 +14,6 @@ const resolvers = {
       const userInfo = context.user
       const folder = `users/${userInfo.username}/image/${imageType}/`
 
-      console.log("image");
-      console.log(image);
-
       // Upload picture to s3
       const uploadResult = await upload(image, folder)
 

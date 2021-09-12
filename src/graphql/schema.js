@@ -3,6 +3,7 @@ const { merge } = require('lodash')
 const login = require('./mutations/login')
 const uploadImage = require('./mutations/uploadImage')
 const signup = require('./mutations/signup')
+const updateUser = require('./mutations/updateUser')
 const getUser = require('./queries/getUser')
 
 const user = require('./types/user')
@@ -23,6 +24,7 @@ const typeDefs = [
     login.typeDefs,
     uploadImage.typeDefs,
     signup.typeDefs,
+    updateUser.typeDefs,
     getUser.typeDefs,
 ]
 
@@ -30,6 +32,7 @@ const resolvers = merge(
     login.resolvers,
     uploadImage.resolvers,
     signup.resolvers,
+    updateUser.resolvers,
     getUser.resolvers,
 )
 
