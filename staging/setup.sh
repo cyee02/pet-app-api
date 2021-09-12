@@ -1,8 +1,8 @@
 #!/bin/bash -xe
 
 # Install Node
-curl -o-  https://raw.githubusercontent.com/creationix/nvm/v0.32.1/install.sh | bash
-source $HOME_DIR/.bashrc
+curl -o $HOME_DIR/install.sh https://raw.githubusercontent.com/creationix/nvm/v0.32.1/install.sh | bash
+source $HOME_DIR.bashrc
 nvm install 16 -y
 
 # Clone repo

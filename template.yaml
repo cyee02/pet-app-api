@@ -170,7 +170,7 @@ Resources:
         Fn::Base64: !Sub |
           #!/bin/bash -xe
 
-          export HOME_DIR='/home/ubuntu'
+          export HOME_DIR='/home/ubuntu/'
 
           echo "=== Begin Userdata ==="
           sudo apt-get update
