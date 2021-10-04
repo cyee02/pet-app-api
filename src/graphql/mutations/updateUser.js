@@ -1,5 +1,6 @@
 const { gql, AuthenticationError } = require('apollo-server')
 const putItem = require('../../aws/putItem')
+const awsConfig = require('../../aws/aws-config.json')
 
 const typeDefs = gql`
   extend type Mutation {
@@ -38,7 +39,7 @@ const resolvers = {
           "description": description,
       }
 
-      const updateUserInfo = await putItem("pet-app-userInfo", newUserInfo)
+      const updateUserInfo = await putItem(awsConfig.DynamoDBUserTable, newUserInfo)
       if (updateUserInfo.$metadata.httpStatusCode !==200){
         return updateUserInfo
       } else {

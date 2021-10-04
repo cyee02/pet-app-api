@@ -1,4 +1,5 @@
 const { gql, AuthenticationError, ValidationError } = require('apollo-server')
+const awsConfig = require('../../aws/aws-config.json')
 
 // AWS actions
 const upload = require('../../aws/upload')
@@ -15,7 +16,7 @@ const resolvers = {
       const folder = `users/${userInfo.username}/image/${imageType}/`
 
       // Upload picture to s3
-      const uploadResult = await upload(image, folder)
+      const uploadResult = await upload(image, folder, awsConfig.ImageBucketName)
 
       // Update dynamodb for the uri
       if (userInfo[imageType] === undefined ) {
@@ -24,7 +25,7 @@ const resolvers = {
       } else {
         userInfo[imageType].push(uploadResult.uri)
       }
-      await putItem("pet-app-userInfo", userInfo)
+      await putItem(awsConfig.DynamoDBUserTable, userInfo)
       return uploadResult.uri
     }
   }

@@ -12,7 +12,7 @@ cd $ROOT_DIR
 
 echo "deploying application.."
 aws cloudformation deploy \
-  --template-file $ROOT_DIR/template.yaml \
+  --template-file $ROOT_DIR/cfn-template/template.yaml \
   --stack-name $STACK_NAME \
   --capabilities CAPABILITY_NAMED_IAM
 

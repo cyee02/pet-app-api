@@ -3,6 +3,7 @@ const yup = require('yup')
 const bcrypt = require('bcryptjs')
 const {v4: uuid} = require('uuid')
 
+const awsConfig = require('../../aws/aws-config.json')
 const getLogin = require('../../aws/getLogin')
 const putItem = require('../../aws/putItem')
 
@@ -87,8 +88,8 @@ const resolvers = {
       }
       console.log(newUserInfo);
       
-      const updateUser = await putItem("pet-app-login", newUser)
-      const updateUserInfo = await putItem("pet-app-userInfo", newUserInfo)
+      const updateUser = await putItem(awsConfig.DynamoDBLoginTable, newUser)
+      const updateUserInfo = await putItem(awsConfig.DynamoDBUserTable, newUserInfo)
       console.log(updateUserInfo);
       if (updateUser.$metadata.httpStatusCode !== 200){
         return updateUser

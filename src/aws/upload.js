@@ -2,17 +2,17 @@ const aws = require('aws-sdk');
 const { v4: uuid } = require('uuid');
 const { extname } = require('path');
 
-const s3 = new aws.S3({
-  // endpoint: spacesEndpoint,
-  params: {
-    ACL: 'public-read',
-    Bucket: 'pet-app',
-  },
-});
-
-const upload = async (file, folder) => {
+const upload = async (file, folder, bucket) => {
   if(!file) return null;
   const { createReadStream, filename, mimetype, encoding } = await file;
+
+  const s3 = new aws.S3({
+    // endpoint: spacesEndpoint,
+    params: {
+      ACL: 'public-read',
+      Bucket: bucket,
+    },
+  });
 
   try {
     const { Location } = await s3.upload({ 

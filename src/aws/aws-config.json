@@ -1,0 +1,5 @@
+{
+  "ImageBucketName": "pet-app-api-image-bucket",
+  "DynamoDBLoginTable": "pet-app-api-login",
+  "DynamoDBUserTable": "pet-app-api-user"
+}

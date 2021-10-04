@@ -1,12 +1,13 @@
 const { DynamoDB } = require("@aws-sdk/client-dynamodb")
 const dynamodb_client = new DynamoDB({region: "ap-southeast-1"})
+const awsConfig = require("./aws-config.json")
 
 const attr = require('dynamodb-data-types').AttributeValue;
 
 const getUser = async (token) => {
   const key = attr.wrap(token)
   const params = {
-    TableName: "pet-app-userInfo",
+    TableName: awsConfig.DynamoDBUserTable,
     Key: key,
     ProjectionExpression: "username, id, address, description, email, firstName, lastName, gender, phoneNumber, profilePicture, images"
   }

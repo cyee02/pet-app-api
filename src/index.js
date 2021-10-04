@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors')
 const { ApolloServer } = require('apollo-server-express');
 const { typeDefs, resolvers } = require('./graphql/schema.js')
 const  { verifyToken } = require('./utils/authService')
@@ -6,6 +7,8 @@ const getUser = require('./aws/getUser')
 
 const app = express();
 const PORT = process.env.SERVER_PORT || 4000;
+
+app.use(cors())
 
 const server = new ApolloServer({
   typeDefs,

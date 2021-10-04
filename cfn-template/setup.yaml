@@ -1,0 +1,91 @@
+---
+Description: S3 and DynamoDB
+
+Parameters:
+  ImageBucketName:
+    Type: String
+    Default: bucket
+    Description: Bucket for storage
+  DynamoDBLoginTable:
+    Type: String
+    Default: login
+    Description: DynamoDB table containing login information
+  DynamoDBUserTable:
+    Type: String
+    Default: user
+    Description: DynamoDB table containing user information
+
+Resources:
+  LoginTable:
+    Type: AWS::DynamoDB::Table
+    Properties: 
+      AttributeDefinitions: 
+        - AttributeName: username
+          AttributeType: S
+        # - AttributeName: id
+        #   AttributeType: S
+        # - AttributeName: password
+        #   AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      KeySchema: 
+        - AttributeName: username
+          KeyType: HASH
+      TableName:
+        Ref: DynamoDBLoginTable
+
+  UserTable:
+    Type: AWS::DynamoDB::Table
+    Properties: 
+      AttributeDefinitions: 
+        - AttributeName: username
+          AttributeType: S
+        - AttributeName: id
+          AttributeType: S
+        # - AttributeName: firstName
+        #   AttributeType: S
+        # - AttributeName: lastName
+        #   AttributeType: S
+        # - AttributeName: address
+        #   AttributeType: S
+        # - AttributeName: gender
+        #   AttributeType: S
+        # - AttributeName: phoneNumber
+        #   AttributeType: S
+        # - AttributeName: description
+        #   AttributeType: S
+        # - AttributeName: email
+        #   AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      KeySchema: 
+        - AttributeName: username
+          KeyType: HASH
+        - AttributeName: id
+          KeyType: RANGE
+      TableName:
+        Ref: DynamoDBUserTable
+
+  Bucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties: 
+      AccessControl: PublicRead
+      BucketName:
+        Ref: ImageBucketName
+
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties: 
+      Bucket:
+        Ref: Bucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: PublicListGet
+            Effect: Allow
+            Principal: "*"
+            Action:
+              - s3:List*
+              - s3:Get*
+            Resource:
+                - Fn::Join: [ "", [ Fn::GetAtt: [ Bucket, Arn ], "/users/*" ] ]

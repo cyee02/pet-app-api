@@ -1,11 +1,12 @@
 const { DynamoDB } = require("@aws-sdk/client-dynamodb")
 const dynamodb_client = new DynamoDB({region: "ap-southeast-1"})
+const awsConfig = require("./aws-config.json")
 
 const attr = require('dynamodb-data-types').AttributeValue;
 
 const getLogin = async (username) => {
   const params = {
-    TableName: "pet-app-login",
+    TableName: awsConfig.DynamoDBLoginTable,
     Key: {
       "username": {
         S: username
