@@ -23,6 +23,7 @@
     "aws-sdk": "^2.950.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
+    "date-fns": "^2.25.0",
     "dotenv": "^10.0.0",
     "dynamodb-data-types": "^3.0.1",
     "express": "^4.17.1",

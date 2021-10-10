@@ -25,7 +25,7 @@ const upload = async (file, folder, bucket) => {
       filename,
       mimetype,
       encoding,
-      uri: Location, 
+      uri: Location,
     }; 
   } catch(e) {
     console.log(e);

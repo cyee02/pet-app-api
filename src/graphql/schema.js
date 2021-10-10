@@ -1,12 +1,21 @@
 const { gql } = require('apollo-server')
 const { merge } = require('lodash')
+
+// Scalars
+const DateTime = require('./scalars/DateTime');
+
+// Queries
+const getUser = require('./queries/getUser')
+
+// Mutations
 const login = require('./mutations/login')
 const uploadImage = require('./mutations/uploadImage')
 const signup = require('./mutations/signup')
 const updateUser = require('./mutations/updateUser')
-const getUser = require('./queries/getUser')
 
+// Types
 const user = require('./types/user')
+const image = require('./types/image')
 
 const rootTypeDefs = gql`
   type Query {
@@ -20,12 +29,21 @@ const rootTypeDefs = gql`
 
 const typeDefs = [
     rootTypeDefs,
+    // Scalars
+    DateTime.typeDefs,
+
+    // Types
     user.typeDefs,
+    image.typeDefs,
+
+    // Queries
+    getUser.typeDefs,
+
+    // Mutations
     login.typeDefs,
     uploadImage.typeDefs,
     signup.typeDefs,
     updateUser.typeDefs,
-    getUser.typeDefs,
 ]
 
 const resolvers = merge(

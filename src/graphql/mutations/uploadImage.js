@@ -5,6 +5,15 @@ const awsConfig = require('../../aws/aws-config.json')
 const upload = require('../../aws/upload')
 const putItem = require('../../aws/putItem')
 
+const typeDefs = gql`
+  extend type Mutation {
+    uploadImage(
+      image: Upload!,
+      imageType: String!
+    ): Image
+  }
+`
+
 const resolvers = {
   Mutation: {
     uploadImage: async (root, args, context) => {
@@ -17,28 +26,25 @@ const resolvers = {
 
       // Upload picture to s3
       const uploadResult = await upload(image, folder, awsConfig.ImageBucketName)
+      const imageInfo = {
+        imageType: imageType,
+        created: new Date(),
+        uri: uploadResult.uri
+      }
 
       // Update dynamodb for the uri
       if (userInfo[imageType] === undefined ) {
         // Initial upload
-        userInfo[imageType] = [uploadResult.uri]
+        userInfo[imageType] = [imageInfo]
       } else {
-        userInfo[imageType].push(uploadResult.uri)
+        // To insert the info into index 0, not deleting any data
+        userInfo[imageType].splice(0, 0, imageInfo)
       }
       await putItem(awsConfig.DynamoDBUserTable, userInfo)
-      return uploadResult.uri
+      return imageInfo
     }
   }
 }
-
-const typeDefs = gql`
-  extend type Mutation {
-    uploadImage(
-      image: Upload,
-      imageType: String
-    ): String
-  }
-`
 
 module.exports = {
   typeDefs,

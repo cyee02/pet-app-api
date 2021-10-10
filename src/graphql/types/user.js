@@ -11,8 +11,8 @@ const typeDefs = gql`
       phoneNumber: String
       description: String
       email: String
-      profilePicture: [String]
-      images: [String]
+      profilePicture: [Image]
+      images: [Image]
     }
     `
 // birthday: String

@@ -5,10 +5,12 @@ const { typeDefs, resolvers } = require('./graphql/schema.js')
 const  { verifyToken } = require('./utils/authService')
 const getUser = require('./aws/getUser')
 
+const bodyParser = require('body-parser');
 const app = express();
 const PORT = process.env.SERVER_PORT || 4000;
 
 app.use(cors())
+app.use(bodyParser.json({limit: '50mb', extended: true}))
 
 const server = new ApolloServer({
   typeDefs,
