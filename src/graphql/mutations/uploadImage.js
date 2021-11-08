@@ -12,6 +12,7 @@ const typeDefs = gql`
       imageType: String!
     ): Image
   }
+  scalar Upload
 `
 
 const resolvers = {
@@ -28,7 +29,7 @@ const resolvers = {
       const uploadResult = await upload(image, folder, awsConfig.ImageBucketName)
       const imageInfo = {
         imageType: imageType,
-        created: new Date(),
+        created: Date.now().toString(),
         uri: uploadResult.uri
       }
 

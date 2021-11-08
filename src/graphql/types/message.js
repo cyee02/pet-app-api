@@ -2,11 +2,11 @@ const { gql } = require('apollo-server')
 
 
 const typeDefs = gql`
-  type Image {
-    imageType: String!
-    image: Upload!
+  type Message {
+    id: ID!
+    user: String!
+    text: String!
     created: DateTime!
-    uri: String!
   }
 `
 
