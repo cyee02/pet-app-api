@@ -16,8 +16,12 @@ Parameters:
     Description: DynamoDB table containing user information
   DynamoDBMessageTable:
     Type: String
-    Default: user
-    Description: DynamoDB table containing user's chat information
+    Default: messages
+    Description: DynamoDB table mapping chat id to messages
+  DynamoDBConversationTable:
+    Type: String
+    Default: conversation
+    Description: DynamoDB table containing user's messages
 
 Resources:
   LoginTable:
@@ -54,18 +58,27 @@ Resources:
     Type: AWS::DynamoDB::Table
     Properties: 
       AttributeDefinitions: 
-        - AttributeName: username
+        - AttributeName: conversationId
           AttributeType: S
-        - AttributeName: id
+      BillingMode: PAY_PER_REQUEST
+      KeySchema: 
+        - AttributeName: conversationId
+          KeyType: HASH
+      TableName:
+        Ref: DynamoDBMessageTable
+
+  ConversationTable:
+    Type: AWS::DynamoDB::Table
+    Properties: 
+      AttributeDefinitions: 
+        - AttributeName: username
           AttributeType: S
       BillingMode: PAY_PER_REQUEST
       KeySchema: 
         - AttributeName: username
           KeyType: HASH
-        - AttributeName: id
-          KeyType: RANGE
       TableName:
-        Ref: DynamoDBMessageTable
+        Ref: DynamoDBConversationTable
 
   Bucket:
     Type: AWS::S3::Bucket
@@ -75,6 +88,16 @@ Resources:
       AccessControl: PublicRead
       BucketName:
         Ref: ImageBucketName
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders:
+              - '*'
+            AllowedMethods:
+              - 'GET'
+              - 'HEAD'
+            AllowedOrigins:
+              - '*'
+            MaxAge: 3000
 
   BucketPolicy:
     Type: AWS::S3::BucketPolicy

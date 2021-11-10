@@ -1,23 +1,22 @@
 const { gql, AuthenticationError } = require('apollo-server')
-const getMessage = require('../../aws/getMessage')
+const getConversation = require('../../aws/getConversation')
 
 const typeDefs = gql`
   extend type Query {
-    getMessage (conversationId: String!)
-    : [Message]
+    getConversation: [Conversation]
   }
 `
 
 const resolvers = {
   Query: {
-    getMessage: async (root, args, context) => {
+    getConversation: async (root, args, context) => {
       // Check authorization
       if (!context.user) throw new AuthenticationError("Please provide authorization")
 
-      // Get input
-      const {conversationId} = args
-      const response = await getMessage(conversationId)
-      return response
+      // Query table
+      const conversations = await getConversation(context.user.username)
+
+      return conversations
     }
   }
 }

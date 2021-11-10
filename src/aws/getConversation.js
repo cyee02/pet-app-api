@@ -4,25 +4,25 @@ const attr = require('dynamodb-data-types').AttributeValue;
 
 const dynamodb_client = new DynamoDB({region: "ap-southeast-1"})
 
-const getMessage = async (conversationId) => {
+const getConversation = async (username) => {
   const key = attr.wrap({
-    conversationId: conversationId
+    username: username
   })
   const params = {
-    TableName: awsConfig.DynamoDBMessageTable,
+    TableName: awsConfig.DynamoDBConversationTable,
     Key: key,
-    ProjectionExpression: "messages"
+    ProjectionExpression: "conversations"
   }
   try {
     const results = await dynamodb_client.getItem(params)
-    if (attr.unwrap(results.Item).messages === undefined){
+    if (results.Item ===  undefined){
       return []
     } else {
-      return attr.unwrap(results.Item).messages
+      return attr.unwrap(results.Item).conversations
     }
   } catch (error) {
     return error
   }
 }
 
-module.exports = getMessage
+module.exports = getConversation
