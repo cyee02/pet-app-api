@@ -12,8 +12,7 @@ const typeDefs = gql`
     ): Message
   }
   extend type Subscription {
-    conversationId: String!
-    messages: [Message]
+    messages(conversationId: String!): [Message]
   }
 `
 
@@ -44,7 +43,7 @@ const resolvers = {
       }
 
       // Publish new messages
-      context.pubsub.publish('MESSAGES', {conversationId: conversationId, messages: messages})
+      context.pubsub.publish(conversationId, {messages: messages})
 
       const updateMessage = await putItem(awsConfig.DynamoDBMessageTable, payload)
       if (updateMessage.$metadata.httpStatusCode !==200){
@@ -57,7 +56,8 @@ const resolvers = {
   Subscription: {
     messages: {
       subscribe: (root, args, context) => {
-        return context.pubsub.asyncIterator(['MESSAGES'])
+        const {conversationId} = args
+        return context.pubsub.asyncIterator([conversationId])
       },
     },
   },
