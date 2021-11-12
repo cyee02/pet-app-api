@@ -3,5 +3,6 @@
   "DynamoDBLoginTable": "pet-app-api-login",
   "DynamoDBUserTable": "pet-app-api-user",
   "DynamoDBMessageTable": "pet-app-api-messages",
-  "DynamoDBConversationTable": "pet-app-api-conversation"
+  "DynamoDBConversationTable": "pet-app-api-conversation",
+  "DynamoDBProfileTable": "pet-app-api-profile"
 }

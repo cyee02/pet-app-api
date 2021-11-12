@@ -68,36 +68,50 @@ const resolvers = {
       const userId = uuid()
       const passwordHash = await createPasswordHash(password)
 
-      // Create new user in pet-app-login table
+      // Create new user in login table
       const newUser = {
         "username": username,
         "id": userId,
         "password": passwordHash
       }
-      // Create new user in pet-app-userInfo table
+      // Private information to store in user table
       const newUserInfo = {
           "username": username,
           "id": userId,
-          "firstName": firstName,
-          "lastName": lastName,
           "address": address,
           "gender": gender,
           "phoneNumber": phoneNumber,
-          "description": description,
           "email": email,
       }
-      console.log(newUserInfo);
+      // Public information to store in profile table
+      const newProfileInfo = {
+        "username": username,
+        "firstName": firstName,
+        "lastName": lastName,
+        "description": description
+      }
       
       const updateUser = await putItem(awsConfig.DynamoDBLoginTable, newUser)
       const updateUserInfo = await putItem(awsConfig.DynamoDBUserTable, newUserInfo)
-      console.log(updateUserInfo);
+      const updateProfileInfo = await putItem(awsConfig.DynamoDBProfileTable, newProfileInfo)
       if (updateUser.$metadata.httpStatusCode !== 200){
         return updateUser
       } else if (updateUserInfo.$metadata.httpStatusCode !== 200){
         return updateUserInfo
+      } else if (updateProfileInfo.$metadata.httpStatusCode !== 200){
+        return updateProfileInfo
       } else {
-        console.log(newUserInfo);
-        return newUserInfo
+        return {
+          "username": username,
+          "id": userId,
+          "firstName": firstName,
+          "lastName": lastName,
+          "description": description,
+          "address": address,
+          "gender": gender,
+          "phoneNumber": phoneNumber,
+          "email": email,
+        }
       }
     }
   }

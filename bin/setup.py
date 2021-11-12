@@ -7,6 +7,7 @@ login_table_name = f"{app_name}-login"
 user_table_name = f"{app_name}-user"
 message_table_name = f"{app_name}-messages"
 conversation_table_name = f"{app_name}-conversation"
+profile_table_name = f"{app_name}-profile"
 
 # Write to json for api usage
 aws_config = {
@@ -14,7 +15,8 @@ aws_config = {
   "DynamoDBLoginTable": login_table_name,
   "DynamoDBUserTable": user_table_name,
   "DynamoDBMessageTable": message_table_name,
-  "DynamoDBConversationTable": conversation_table_name
+  "DynamoDBConversationTable": conversation_table_name,
+  "DynamoDBProfileTable": profile_table_name
 }
 with open('./src/aws/aws-config.json', 'w') as outfile:
   json.dump(aws_config, outfile, indent=2)

@@ -22,8 +22,15 @@ const resolvers = {
       const {image, imageType} = args
       if (imageType !== "profilePicture" && imageType !== "images") throw new ValidationError (`imageType must be 'profilePicture' or 'images', received '${imageType}'`)
 
-      const userInfo = context.user
-      const folder = `users/${userInfo.username}/image/${imageType}/`
+      const profileInfo = {
+        "username": context.user.username,
+        "description": context.user.description,
+        "firstName": context.user.firstName,
+        "lastName": context.user.lastName,
+        "images": context.user.images,
+        "profilePicture": context.user.profilePicture
+      }
+      const folder = `users/${profileInfo.username}/image/${imageType}/`
 
       // Upload picture to s3
       const uploadResult = await upload(image, folder, awsConfig.ImageBucketName)
@@ -34,14 +41,14 @@ const resolvers = {
       }
 
       // Update dynamodb for the uri
-      if (userInfo[imageType] === undefined ) {
+      if (profileInfo[imageType] === undefined ) {
         // Initial upload
-        userInfo[imageType] = [imageInfo]
+        profileInfo[imageType] = [imageInfo]
       } else {
         // To insert the info into index 0, not deleting any data
-        userInfo[imageType].splice(0, 0, imageInfo)
+        profileInfo[imageType].splice(0, 0, imageInfo)
       }
-      await putItem(awsConfig.DynamoDBUserTable, userInfo)
+      await putItem(awsConfig.DynamoDBProfileTable, profileInfo)
       return imageInfo
     }
   }

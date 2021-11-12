@@ -31,19 +31,29 @@ const resolvers = {
 
       // Update user info in pet-app-userInfo table
       const newUserInfo = {
-          ...context.user,
-          "firstName": firstName,
-          "lastName": lastName,
-          "address": address,
-          "phoneNumber": phoneNumber,
-          "description": description,
+        "username": context.user.username,
+        "id": context.user.id,
+        "address": address,
+        "email": context.user.email,
+        "gender": context.user.gender,
+        "phoneNumber": phoneNumber,
+      }
+      const newProfileInfo = {
+        "username": context.user.username,
+        "description": description,
+        "firstName": firstName,
+        "lastName": lastName,
       }
 
       const updateUserInfo = await putItem(awsConfig.DynamoDBUserTable, newUserInfo)
+      const updateProfileInfo = await putItem(awsConfig.DynamoDBProfileTable, newProfileInfo)
       if (updateUserInfo.$metadata.httpStatusCode !==200){
         return updateUserInfo
+      } else if (updateProfileInfo.$metadata.httpStatusCode !==200){
+        return updateProfileInfo
       } else {
-        return newUserInfo
+        delete newProfileInfo.username
+        return Object.assign(newUserInfo, newProfileInfo, {"email": context.user.email})
       }
     }
   }

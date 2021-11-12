@@ -6,6 +6,7 @@ const DateTime = require('./scalars/DateTime');
 
 // Queries
 const getUser = require('./queries/getUser')
+const getProfile = require('./queries/getProfile')
 const getConversation = require('./queries/getConversation')
 const getMessage = require('./queries/getMessage')
 
@@ -19,6 +20,7 @@ const postMessage = require('./mutations/postMessage')
 
 // Types
 const user = require('./types/user')
+const profile = require('./types/profile')
 const image = require('./types/image')
 const message = require('./types/message')
 const conversation = require('./types/conversation')
@@ -44,12 +46,14 @@ const typeDefs = [
 
     // Types
     user.typeDefs,
+    profile.typeDefs,
     image.typeDefs,
     message.typeDefs,
     conversation.typeDefs,
 
     // Queries
     getUser.typeDefs,
+    getProfile.typeDefs,
     getMessage.typeDefs,
     getConversation.typeDefs,
 
@@ -68,6 +72,7 @@ const resolvers = merge(
     signup.resolvers,
     updateUser.resolvers,
     getUser.resolvers,
+    getProfile.resolvers,
     getConversation.resolvers,
     createConversation.resolvers,
     getMessage.resolvers,

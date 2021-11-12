@@ -22,6 +22,10 @@ Parameters:
     Type: String
     Default: conversation
     Description: DynamoDB table containing user's messages
+  DynamoDBProfileTable:
+    Type: String
+    Default: profile
+    Description: DynamoDB table containing user's public information
 
 Resources:
   LoginTable:
@@ -79,6 +83,19 @@ Resources:
           KeyType: HASH
       TableName:
         Ref: DynamoDBConversationTable
+
+  ProfileTable:
+    Type: AWS::DynamoDB::Table
+    Properties: 
+      AttributeDefinitions: 
+        - AttributeName: username
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      KeySchema: 
+        - AttributeName: username
+          KeyType: HASH
+      TableName:
+        Ref: DynamoDBProfileTable
 
   Bucket:
     Type: AWS::S3::Bucket
