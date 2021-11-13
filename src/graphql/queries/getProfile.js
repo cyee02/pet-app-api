@@ -10,8 +10,6 @@ const typeDefs = gql`
 const resolvers = {
   Query: {
     getProfile: async (root, args, context) => {
-      // Check authorization
-      if (!context.user) throw new AuthenticationError("Please provide authorization")
       const response = await getProfile(args.username)
       return response
     }
