@@ -55,8 +55,11 @@ const resolvers = {
   },
   Subscription: {
     messages: {
-      subscribe: (root, args, context) => {
+      subscribe: async (root, args, context) => {
         const {conversationId} = args
+        // Get Message
+        const messages = await getMessage(conversationId)
+        setTimeout(() => context.pubsub.publish(conversationId, {messages: messages}), 0);
         return context.pubsub.asyncIterator([conversationId])
       },
     },

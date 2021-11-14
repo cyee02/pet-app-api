@@ -7,6 +7,7 @@ const DateTime = require('./scalars/DateTime');
 // Queries
 const getUser = require('./queries/getUser')
 const getProfile = require('./queries/getProfile')
+const getProfiles = require('./queries/getProfiles')
 const getConversation = require('./queries/getConversation')
 const getMessage = require('./queries/getMessage')
 
@@ -54,6 +55,7 @@ const typeDefs = [
     // Queries
     getUser.typeDefs,
     getProfile.typeDefs,
+    getProfiles.typeDefs,
     getMessage.typeDefs,
     getConversation.typeDefs,
 
@@ -73,6 +75,7 @@ const resolvers = merge(
     updateUser.resolvers,
     getUser.resolvers,
     getProfile.resolvers,
+    getProfiles.resolvers,
     getConversation.resolvers,
     createConversation.resolvers,
     getMessage.resolvers,
