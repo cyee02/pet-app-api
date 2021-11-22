@@ -3,4 +3,3 @@ src/.env
 dist
 scratch_folder
 key.pem
-src/aws/aws-config.json

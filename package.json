@@ -4,12 +4,12 @@
   "description": "graphql API for pet-app",
   "main": "src/index.js",
   "scripts": {
-    "start": "node ./src/index.js",
+    "start": "forever start ./src/index.js",
     "dev": "nodemon ./src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "deploy": "./bin/deploy.sh",
     "teardown": "./bin/teardown.sh",
-    "setup-aws": "./bin/setup.sh"
+    "setup": "./bin/setup.sh"
   },
   "author": "chongyeechia",
   "license": "ISC",

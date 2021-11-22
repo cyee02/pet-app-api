@@ -6,7 +6,7 @@ set -euo pipefail
 
 CURRENT_DIR=$(pwd)
 ROOT_DIR="$( dirname "${BASH_SOURCE[0]}" )"/..
-STACK_NAME=pet-app-api
+STACK_NAME=pet-app-api-backend
 
 cd $ROOT_DIR
 

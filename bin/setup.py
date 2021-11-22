@@ -1,6 +1,6 @@
 import json
 
-app_name = json.load(open('package.json'))['name']
+app_name = json.load(open('package.json'))['name'] + '-setup'
 
 bucket_name = f"{app_name}-image-bucket"
 login_table_name = f"{app_name}-login"

@@ -29,52 +29,5 @@ const verifyToken = (token) => {
     throw new AuthenticationError('Invalid authorization key')
   }
 };
-// class AuthService {
-//   constructor({ accessToken }) {
-//     this.accessToken = accessToken;
-//     // this.dataLoaders = dataLoaders;
-//   }
-
-//   async getAuthorizedUserId() {
-//     if (!this.accessToken) {
-//       return null;
-//     }
-
-//     let tokenPayload;
-
-//     try {
-//       tokenPayload = verifyJwt(this.accessToken, { subject });
-//     } catch (e) {
-//       return null;
-//     }
-
-//     return tokenPayload.userId;
-//   }
-
-//   // async getAuthorizedUser() {
-//   //   const id = await this.getAuthorizedUserId();
-
-//   //   if (!id) {
-//   //     return null;
-//   //   }
-
-//   //   return this.dataLoaders.userLoader.load(id);
-//   // }
-
-//   // async getAuthorizedUserOrFail(error) {
-//   //   const normalizedError =
-//   //     error || new AuthenticationError('Please provide authorization key');
-
-//   //   const user = await this.getAuthorizedUser();
-
-//   //   if (!user) {
-//   //     throw normalizedError;
-//   //   }
-
-//   //   return user;
-//   // }
-
-
-// }
 
 module.exports = { createAccessToken, verifyToken }

@@ -5,7 +5,7 @@ Parameters:
   AMI:
     Type: String
     Default: ami-0d058fe428540cd89
-    Description: The Ubuntu AMI to use.
+    Description: The AMI to use.
   GitUrl:
     Type: String
     Default: "https://github.com/cyee02/pet-app-api.git"
@@ -20,7 +20,7 @@ Parameters:
     Description: The key used to access the instance.
   MyIP:
     Type: String
-    Default: 218.212.92.100/32
+    Default: 218.212.0.0/16
     Description: Your IP address to restrict SSH to instance
   NodeVersion:
     Type: String
@@ -28,11 +28,11 @@ Parameters:
     Description: Node version to run
   SubnetId:
     Type: String
-    Default: subnet-0352da80110c23eb8
+    Default: subnet-06e2733a9d2a99023
     Description: Subnet to deploy the instance
   VpcId:
     Type: String
-    Default: vpc-0674385a9b9c33c99
+    Default: vpc-0bd20ab0dd184d3f0
     Description: VPC to deploy the instance
 
 Resources:
@@ -57,15 +57,16 @@ Resources:
           FromPort: 443
           ToPort: 443
           CidrIp:  0.0.0.0/0
+          # Update to allow http/https request only from frontend
       SecurityGroupEgress:
         - IpProtocol: "-1"
           CidrIp: 0.0.0.0/0
 
-  # ElasticIP:
-  #   Type: AWS::EC2::EIP
-  #   Properties:
-  #     Domain: vpc
-  #     InstanceId: !Ref Server
+  ElasticIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      InstanceId: !Ref Server
 
   ServerRole:
     Type: "AWS::IAM::Role"
@@ -88,6 +89,7 @@ Resources:
             - Effect: Allow
               Action:
               - dynamodb:GetItem
+              - dynamodb:BatchGetItem
               - dynamodb:PutItem
               - dynamodb:DeleteItem
               Resource: "*"
@@ -110,54 +112,6 @@ Resources:
 
   Server:
     Type: AWS::EC2::Instance
-    # Metadata:
-    #     AWS::Cloudformation::Init:
-    #       configSets:
-    #         default:
-    #           - node
-    #           - git
-    #           - nginx
-
-    #       node:
-    #         commands: 
-    #           01-node-install:
-    #             command: 
-    #               Fn::Sub:
-    #                 - |+
-    #                     #!/bin/bash -x
-    #                     curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.32.1/install.sh | bash 
-    #                     source $HOME_DIR/.bashrc
-    #                     nvm install ${NodeVersion} -y
-    #                 - Param: "NA"
-    #       git:
-    #         commands: 
-    #           01-git-install-clone:
-    #             command: 
-    #               Fn::Sub:
-    #                 - |+
-    #                     #!/bin/bash -x
-    #                     sudo apt-get install git -y
-    #                     git clone ${GitUrl}
-    #                     cd pet-app-api
-    #                     npm install
-    #                 - Param: "NA"
-    #       nginx:
-    #         commands: 
-    #           01-nginx-install-start:
-    #             command: 
-    #                 - |+
-    #                     #!/bin/bash -x
-    #                     sudo apt-get install nginx -y
-    #                     sudo rm /etc/nginx/sites-enabled/default
-    #                     echo "listing current directory"
-    #                     ls
-    #                     sudo cp /pet-app-api/staging/nginx_config /etc/nginx/sites-available/pet-app-api
-    #                     sudo ln -s /etc/nginx/sites-available/pet-app-api /etc/nginx/sites-enabled/pet-app-api
-    #                     sudo /etc/init.d/nginx start
-    #                     cd pet-app-api
-    #                     npm start
-    #                 - Param: "NA"
-
     Properties:
       IamInstanceProfile: !Ref ServerInstanceProfile
       ImageId: !Ref AMI
@@ -166,16 +120,26 @@ Resources:
       SubnetId: !Ref SubnetId
       SecurityGroupIds:
         - !Ref InstanceSecurityGroup
+
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash -xe
 
-          export HOME_DIR='/home/ubuntu/'
+          sudo su
+
+          export HOME_DIR='/home/ubuntu'
 
           echo "=== Begin Userdata ==="
-          sudo apt-get update
-          git clone ${GitUrl} $HOME_DIR/pet-app-api
+          apt-get update
+          sudo snap install node --classic --channel ${NodeVersion}/stable
+          npm install forever -g
 
-          bash $HOME_DIR/pet-app-api/staging/setup.sh
+          git clone ${GitUrl} $HOME_DIR/pet-app-api
+          cd $HOME_DIR/pet-app-api
+          npm install
+
+          iptables -t nat -I PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 4000
+
+          npm start
 
           echo "=== End Userdata - SUCCESS ==="

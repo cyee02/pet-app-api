@@ -1,8 +1,8 @@
 {
-  "ImageBucketName": "pet-app-api-image-bucket",
-  "DynamoDBLoginTable": "pet-app-api-login",
-  "DynamoDBUserTable": "pet-app-api-user",
-  "DynamoDBMessageTable": "pet-app-api-messages",
-  "DynamoDBConversationTable": "pet-app-api-conversation",
-  "DynamoDBProfileTable": "pet-app-api-profile"
+  "ImageBucketName": "pet-app-api-setup-image-bucket",
+  "DynamoDBLoginTable": "pet-app-api-setup-login",
+  "DynamoDBUserTable": "pet-app-api-setup-user",
+  "DynamoDBMessageTable": "pet-app-api-setup-messages",
+  "DynamoDBConversationTable": "pet-app-api-setup-conversation",
+  "DynamoDBProfileTable": "pet-app-api-setup-profile"
 }
