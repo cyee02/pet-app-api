@@ -43,6 +43,8 @@ const resolvers = {
         "description": description,
         "firstName": firstName,
         "lastName": lastName,
+        "images": context.user.images,
+        "profilePicture": context.user.profilePicture,
       }
 
       const updateUserInfo = await putItem(awsConfig.DynamoDBUserTable, newUserInfo)

@@ -1,0 +1,321 @@
+---
+Description: Backend API server
+
+Parameters:
+  AMI:
+    Type: String
+    Default: ami-0d058fe428540cd89
+    Description: The AMI to use.
+  ServerGitUrl:
+    Type: String
+    Default: "https://github.com/cyee02/pet-app-api.git"
+    Description: Git repo to clone from
+  ClientGitUrl:
+    Type: String
+    Default: "https://github.com/cyee02/pet-app.git"
+    Description: Git repo to clone from
+  InstanceTypeParameter:
+    Type: String
+    Default: t2.micro
+    Description: Enter instance size. Default is t2.micro.
+  Key:
+    Type: String
+    Default: key
+    Description: The key used to access the instance.
+  MyIP:
+    Type: String
+    Default: 218.212.0.0/16
+    Description: Your IP address to restrict SSH to instance
+  NodeVersion:
+    Type: String
+    Default: "16"
+    Description: Node version to run
+  Subnet1Id:
+    Type: String
+    Default: subnet-043053926c7a3ee3f
+    Description: Subnet to deploy the instance
+  Subnet2Id:
+    Type: String
+    Default: subnet-04a6010df3134a240
+    Description: Dummy subnet
+  VpcId:
+    Type: String
+    Default: vpc-0345658af1d466ce1
+    Description: VPC to deploy the instance
+
+Resources:
+  # ===== Security =====
+
+  ServerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: 'Security group for backend-api'
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        # - Description: 'Allow SSH only from my IP'
+        #   IpProtocol: tcp
+        #   FromPort: 22
+        #   ToPort: 22
+        #   CidrIp:  !Ref MyIP
+        # - Description: 'Allow HTTP from Alb'
+        #   IpProtocol: tcp
+        #   FromPort: 80
+        #   ToPort: 80
+        #   SourceSecurityGroupId: !Ref ServerLbSecurityGroup
+        - Description: 'Allow HTTP'
+          IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: "-1"
+          CidrIp: 0.0.0.0/0
+
+  # ServerLbSecurityGroup:
+  #   Type: AWS::EC2::SecurityGroup
+  #   Properties:
+  #     GroupDescription: 'Security group for backend-api'
+  #     VpcId: !Ref VpcId
+  #     SecurityGroupIngress:
+  #       - Description: 'Allow HTTP from subnet'
+  #         IpProtocol: tcp
+  #         FromPort: 80
+  #         ToPort: 80
+  #         CidrIp: 10.0.0.0/8
+  #     SecurityGroupEgress:
+  #       - IpProtocol: "-1"
+  #         CidrIp: 0.0.0.0/0
+
+  ClientSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: 'Security group for frontend'
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - Description: 'Allow SSH only from my IP'
+          IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp:  !Ref MyIP
+        - Description: 'serve HTTP'
+          IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp:  0.0.0.0/0
+        - Description: 'serve HTTPs'
+          IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp:  0.0.0.0/0
+          # Update to allow http/https request only from frontend
+      SecurityGroupEgress:
+        - IpProtocol: "-1"
+          CidrIp: 0.0.0.0/0
+
+  ServerRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName: "backend-api-role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "ec2.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Policies:
+        - PolicyName: "DynamodbPolicy"
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+            - Effect: Allow
+              Action:
+              - dynamodb:GetItem
+              - dynamodb:BatchGetItem
+              - dynamodb:PutItem
+              - dynamodb:DeleteItem
+              Resource: "*"
+        - PolicyName: "S3Policy"
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+            - Effect: Allow
+              Action:
+              - s3:Put*
+              - s3:Get*
+              - s3:Describe*
+              Resource: "*"
+
+  ClientRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName: "frontend-role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "ec2.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Policies:
+        - PolicyName: "Setup"
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+            - Effect: Allow
+              Action:
+              - cloudformation:DescribeStackResources
+              - ec2:DescribeInstances
+              Resource: "*"
+
+  ServerInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties: 
+      Roles: 
+        - !Ref ServerRole
+
+  ClientInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties: 
+      Roles: 
+        - !Ref ClientRole
+
+  # ===== Accessories =====
+  ElasticIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      InstanceId: !Ref Client
+
+  TempElasticIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      InstanceId: !Ref Server
+
+  # Alb:
+  #   Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+  #   Properties: 
+  #     Name: backend-lb
+  #     Scheme: internal
+  #     SecurityGroups: 
+  #       - !Ref ServerLbSecurityGroup
+  #     Subnets: 
+  #       - !Ref Subnet1Id
+  #       - !Ref Subnet2Id
+  #     Type: application
+
+  # HttpListener:
+  #   Type: AWS::ElasticLoadBalancingV2::Listener
+  #   Properties: 
+  #     DefaultActions: 
+  #       - Type: forward
+  #         TargetGroupArn: !Ref TargetGroup
+  #         Order: 1
+  #     LoadBalancerArn: !Ref Alb
+  #     Port: 80
+  #     Protocol: HTTP
+
+  # TargetGroup:
+  #   Type: AWS::ElasticLoadBalancingV2::TargetGroup
+  #   Properties: 
+  #     HealthCheckEnabled: true
+  #     HealthCheckIntervalSeconds: 30
+  #     HealthCheckPath: "/graphql"
+  #     HealthCheckPort: traffic-port
+  #     HealthCheckProtocol: HTTP
+  #     HealthCheckTimeoutSeconds: 5
+  #     HealthyThresholdCount: 2
+  #     Name: "instance-target-group"
+  #     Port: 80
+  #     Protocol: HTTP
+  #     Targets: 
+  #       - Id: !Ref Server
+  #     TargetType: instance
+  #     VpcId: !Ref VpcId
+
+  # ===== Servers =====
+  Server:
+    Type: AWS::EC2::Instance
+    Properties:
+      IamInstanceProfile: !Ref ServerInstanceProfile
+      ImageId: !Ref AMI
+      InstanceType: !Ref InstanceTypeParameter
+      KeyName: !Ref Key
+      SubnetId: !Ref Subnet1Id
+      SecurityGroupIds:
+        - !Ref ServerSecurityGroup
+
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash -xe
+
+          sudo su
+
+          export HOME_DIR='/home/ubuntu'
+
+          echo "=== Begin Userdata ==="
+          apt-get update
+          sudo snap install node --classic --channel ${NodeVersion}/stable
+          npm install forever -g
+
+          git clone ${ServerGitUrl} $HOME_DIR/pet-app-api
+          cd $HOME_DIR/pet-app-api
+          npm install
+
+          iptables -t nat -I PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 4000
+
+          apt install python3-pip -y
+          apt install awscli -y
+          pip3 install --upgrade awscli
+          aws s3 cp s3://pet-app-automation/.env ./src/.env
+
+          npm start
+
+          echo "=== End Userdata - SUCCESS ==="
+
+  Client:
+    DependsOn:
+      - Server
+    Type: AWS::EC2::Instance
+    Properties:
+      IamInstanceProfile: !Ref ClientInstanceProfile
+      ImageId: !Ref AMI
+      InstanceType: !Ref InstanceTypeParameter
+      KeyName: !Ref Key
+      SubnetId: !Ref Subnet1Id
+      SecurityGroupIds:
+        - !Ref ClientSecurityGroup
+
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash -xe
+
+          sudo su
+
+          export HOME_DIR='/home/ubuntu'
+
+          echo "=== Begin Userdata ==="
+          apt-get update
+          sudo snap install node --classic --channel ${NodeVersion}/stable
+          npm install serve -g
+
+          git clone ${ClientGitUrl} $HOME_DIR/pet-app
+          cd $HOME_DIR/pet-app
+          npm install
+
+          iptables -t nat -I PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 3000
+
+          apt install python3-pip -y
+          python3 -m pip install boto3
+          python3 ./bin/setupEndpoint.py
+
+          npm run build
+
+          (npm run start&)
+
+          echo "=== End Userdata - SUCCESS ==="
